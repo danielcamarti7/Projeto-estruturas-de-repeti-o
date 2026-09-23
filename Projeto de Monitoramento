@@ -1,0 +1,136 @@
+/* ============================================================
+ * SISTEMA DE MONITORAMENTO DE TEMPERATURA
+ * ------------------------------------------------------------
+ * O programa le um limite de temperatura definido pelo usuario
+ * e, em seguida, le sucessivas temperaturas ate que:
+ *   a) o usuario digite o valor sentinela (-9999) para encerrar
+ *      manualmente; ou
+ *   b) ocorram 3 (tres) temperaturas CONSECUTIVAS acima do
+ *      limite, encerrando o monitoramento automaticamente.
+ *
+ * Ao final, e exibido um relatorio com media, maior, menor,
+ * quantidade de leituras e percentual de leituras acima do
+ * limite.
+ * ============================================================ */
+
+#include <stdio.h>
+
+#define SENTINELA -9999.0   /* valor usado para encerrar manualmente   */
+#define MAX_CONSECUTIVAS 3  /* quantidade de leituras que dispara o
+                                encerramento automatico                */
+
+int main(void) {
+    double limite;               /* limite de temperatura definido    */
+    double temperatura;          /* leitura atual informada           */
+    double soma = 0.0;           /* soma das temperaturas validas      */
+    double maior = -1000.0;      /* maior temperatura registrada       */
+    double menor = 1000.0;       /* menor temperatura registrada       */
+    int qtdLeituras = 0;         /* total de leituras validas          */
+    int qtdAcimaLimite = 0;      /* total de leituras acima do limite  */
+    int consecutivas = 0;        /* contador de leituras consecutivas
+                                     acima do limite                   */
+    int encerradoAutomaticamente = 0; /* flag do motivo de encerramento */
+    int entradaValida;           /* retorno do scanf (1 = valido)      */
+
+    printf("=== SISTEMA DE MONITORAMENTO DE TEMPERATURA ===\n\n");
+
+    /* --------------------------------------------------------
+     * VALIDACAO DO LIMITE DE TEMPERATURA
+     * Usamos do...while porque a pergunta precisa ser feita
+     * pelo menos uma vez, repetindo-se somente enquanto a
+     * entrada for invalida (nao numerica).
+     * -------------------------------------------------------- */
+    do {
+        printf("Informe o limite de temperatura (ex: 35.0): ");
+        entradaValida = scanf("%lf", &limite);
+
+        /* limpa o restante do buffer de entrada (ex: letras digitadas) */
+        while (getchar() != '\n') {
+            /* descarta caracteres ate a quebra de linha */
+        }
+
+        if (!entradaValida) {
+            printf("Entrada invalida! Digite um valor numerico.\n");
+        }
+    } while (!entradaValida);
+
+    printf("\nLimite definido: %.2f C\n", limite);
+    printf("Digite as temperaturas lidas. Para encerrar manualmente, digite %.0f\n\n", SENTINELA);
+
+    /* --------------------------------------------------------
+     * LACO PRINCIPAL DE MONITORAMENTO
+     * Usamos do...while(1) com break interno porque o programa
+     * sempre precisa pedir ao menos uma temperatura antes de
+     * poder avaliar qualquer condicao de parada.
+     * -------------------------------------------------------- */
+    do {
+        /* validacao da temperatura digitada (while) */
+        do {
+            printf("Temperatura #%d: ", qtdLeituras + 1);
+            entradaValida = scanf("%lf", &temperatura);
+
+            while (getchar() != '\n') {
+                /* descarta caracteres invalidos restantes */
+            }
+
+            if (!entradaValida) {
+                printf("Valor invalido! Digite um numero.\n");
+            }
+        } while (!entradaValida);
+
+        /* condicao de encerramento manual */
+        if (temperatura == SENTINELA) {
+            printf("\nEncerramento manual solicitado pelo usuario.\n");
+            break;
+        }
+
+        /* atualiza estatisticas gerais */
+        qtdLeituras++;
+        soma += temperatura;
+        if (temperatura > maior) {
+            maior = temperatura;
+        }
+        if (temperatura < menor) {
+            menor = temperatura;
+        }
+
+        /* verifica se a temperatura esta acima do limite */
+        if (temperatura > limite) {
+            qtdAcimaLimite++;
+            consecutivas++;
+            printf(" -> ALERTA: temperatura acima do limite! (%d consecutiva(s))\n", consecutivas);
+        } else {
+            consecutivas = 0; /* reinicia o contador de consecutivas */
+        }
+
+        /* condicao de encerramento automatico */
+        if (consecutivas >= MAX_CONSECUTIVAS) {
+            encerradoAutomaticamente = 1;
+            printf("\n3 temperaturas consecutivas acima do limite! ");
+            printf("Encerrando monitoramento automaticamente.\n");
+            break;
+        }
+
+    } while (1);
+
+    /* --------------------------------------------------------
+     * RELATORIO FINAL
+     * -------------------------------------------------------- */
+    printf("\n=== RELATORIO FINAL ===\n");
+    if (qtdLeituras > 0) {
+        printf("Quantidade de leituras validas : %d\n", qtdLeituras);
+        printf("Temperatura media               : %.2f C\n", soma / qtdLeituras);
+        printf("Maior temperatura registrada    : %.2f C\n", maior);
+        printf("Menor temperatura registrada    : %.2f C\n", menor);
+        printf("Leituras acima do limite        : %d (%.1f%%)\n",
+               qtdAcimaLimite, (qtdAcimaLimite * 100.0) / qtdLeituras);
+        printf("Motivo do encerramento          : %s\n",
+               encerradoAutomaticamente
+                   ? "Automatico (3 temperaturas consecutivas acima do limite)"
+                   : "Manual (usuario digitou o valor sentinela)");
+    } else {
+        printf("Nenhuma leitura valida foi registrada.\n");
+    }
+
+    return 0;
+}
