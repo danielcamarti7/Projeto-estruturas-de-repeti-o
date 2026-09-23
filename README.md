@@ -84,28 +84,34 @@ vez. Para encerrar manualmente o monitoramento a qualquer momento, digite
 
 ## 6. Testes realizados
 
-As saídas completas de cada teste estão na pasta `evidencias/`.
+As capturas de tela de cada teste estão na pasta `evidencias/` (`teste01.png`,
+`teste02.png`, `teste03.png`).
 
 ### Teste 1 — Validação de entradas inválidas
-**Entrada:** limite `35`, depois `abc` (inválido), `28`, `30`, `-9999`.
-**Resultado:** o valor `abc` foi rejeitado e o programa pediu a mesma leitura
-novamente, sem contabilizá-lo. Apenas as 2 leituras válidas (28 e 30) entraram
-no relatório final, ambas abaixo do limite. Encerramento manual.
+**Entrada:** ao ser solicitado o limite de temperatura, foram digitados os
+valores `abc` e `teste`.
+**Resultado:** o programa identificou corretamente que nenhum dos dois valores
+é numérico, exibiu a mensagem "Entrada invalida! Digite um valor numerico." e
+repetiu a pergunta em laço até que um valor válido fosse informado, sem
+avançar para a fase de leitura das temperaturas.
 
 ### Teste 2 — Temperaturas acima do limite, porém não consecutivas
-**Entrada:** limite `30`, depois `32, 25, 33, 28, 31, -9999`.
-**Resultado:** houve 3 leituras acima do limite (32, 33 e 31), mas
-intercaladas com leituras dentro do limite (25 e 28), então o contador de
-consecutivas foi reiniciado a cada vez e o monitoramento **não** foi
-encerrado automaticamente. Encerramento manual, com 60% das leituras acima
-do limite.
+**Entrada:** limite `40`, seguido das temperaturas `49, 30, 75, 21, 65`.
+**Resultado:** as leituras 49, 75 e 65 ficaram acima do limite e geraram
+alerta, porém sempre intercaladas por leituras dentro do limite (30 e 21).
+Por isso, o contador de consecutivas foi reiniciado a cada uma delas
+(permanecendo sempre em "1 consecutiva(s)"), e o monitoramento **não** foi
+encerrado automaticamente, confirmando que o reinício do contador funciona
+corretamente.
 
 ### Teste 3 — Três temperaturas consecutivas acima do limite
-**Entrada:** limite `30`, depois `29, 32, 34, 36`.
-**Resultado:** as leituras 32, 34 e 36 vieram em sequência, todas acima do
-limite. Ao atingir a 3ª consecutiva, o programa encerrou o monitoramento
-**automaticamente**, sem precisar do valor sentinela, e exibiu o relatório
-final com o motivo "Automático".
+**Entrada:** limite `40`, seguido das temperaturas `42, 47, 50`.
+**Resultado:** as três leituras vieram em sequência, todas acima do limite,
+incrementando o contador de consecutivas até 3. Ao atingir o valor máximo, o
+programa encerrou o monitoramento **automaticamente** e exibiu o relatório
+final: 3 leituras válidas, média de 46,33 °C, maior temperatura 50,00 °C,
+menor 42,00 °C, 100% das leituras acima do limite e motivo do encerramento
+"Automático (3 temperaturas consecutivas acima do limite)".
 
 ## 7. Reflexão final
 
